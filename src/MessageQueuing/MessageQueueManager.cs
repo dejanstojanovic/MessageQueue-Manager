@@ -110,6 +110,18 @@ namespace MessageQueuing
         }
 
         /// <summary>
+        /// Adds message to message queue
+        /// </summary>
+        /// <param name="queueMessageObject">Object to be put to message queue</param>
+        /// <param name="messageExpiration">How long message will be kept in the queue until it expires</param>
+        public void AddMessage(T queueMessageObject, int messageExpiration)
+        {
+            var message = new Message(queueMessageObject);
+            message.TimeToBeReceived = TimeSpan.FromMinutes(messageExpiration);
+            messageQueue.Send(message);
+        }
+
+        /// <summary>
         /// Read the message from the queue
         /// </summary>
         /// <returns>Instance of object T fetched from the queue</returns>
