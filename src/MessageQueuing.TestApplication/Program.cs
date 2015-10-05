@@ -12,13 +12,16 @@ namespace MessageQueuing.TestApplication
         {
             var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue");
 
-            for(int i = 0; i < 13; i++)
-            {
-                queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated=DateTime.Now });
-            }
+            //for(int i = 0; i < 13; i++)
+            //while(true)
+            //{
+            //    queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated=DateTime.Now });
+            //}
 
             queueManager.MessageReceived += QueueManager_MessageReceived;
 
+            Console.ReadLine();
+            queueManager.Dispose();
             Console.ReadLine();
         }
 

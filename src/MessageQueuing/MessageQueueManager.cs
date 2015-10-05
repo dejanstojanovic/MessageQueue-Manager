@@ -131,7 +131,6 @@ namespace MessageQueuing
                 disposing = true;
                 cancellationTokenSource.Cancel();
                 messageQueue.Dispose();
-                workerTask.Dispose();
             }
         }
 
