@@ -18,7 +18,7 @@ namespace MessageQueuing
         private MessageQueue messageQueue;
         private bool readQueue = true;
         private bool disposing = false;
-        private int readTimeout = 1000;
+        private int? readTimeout = null;
 
         private CancellationTokenSource cancellationTokenSource;
         private CancellationToken cancellationToken;
@@ -49,7 +49,7 @@ namespace MessageQueuing
         /// <summary>
         /// Message Queue read timeout in miliseconds
         /// </summary>
-        public int ReadTimeout {
+        public int? ReadTimeout {
             get
             {
                 return readTimeout;
@@ -131,7 +131,14 @@ namespace MessageQueuing
             {
                 try
                 {
-                    return messageQueue.Receive(TimeSpan.FromMilliseconds(this.readTimeout)).Body as T;
+                    if (this.readTimeout.HasValue)
+                    {
+                        return messageQueue.Receive(TimeSpan.FromMilliseconds(this.readTimeout.Value)).Body as T;
+                    }
+                    else
+                    {
+                        return messageQueue.Receive().Body as T;
+                    }
                 }
                 catch (MessageQueueException ex)
                 {
