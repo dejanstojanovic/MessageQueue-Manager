@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Messaging;
 using System.Text;
@@ -11,19 +12,36 @@ namespace MessageQueuing.TestApplication
     {
         static void Main(string[] args)
         {
+            /*--------------------- SIZE TEST START ---------------------*/
 
+            /* Using JSON formatter */
             using (var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue", new JsonMessageFormatter()))
             {
                 queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
-
             }
 
+            /* Using XML formatter */
             using (var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue", new XmlMessageFormatter()))
             {
                 queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
-
             }
+            /*--------------------- SIZE TEST END ---------------------*/
 
+
+            /*--------------------- SPEED TEST START ---------------------*/
+            var JsonTimer = Stopwatch.StartNew();
+            new JsonMessageFormatter().Write(new Message(), new SampleModel());
+            JsonTimer.Stop();
+
+            var XmlTimer = Stopwatch.StartNew();
+            new XmlMessageFormatter().Write(new Message(), new SampleModel());
+            XmlTimer.Stop();
+
+            Console.WriteLine("JSON: {0}", JsonTimer.ElapsedMilliseconds);
+            Console.WriteLine("XML: {0}", XmlTimer.ElapsedMilliseconds);
+            /*--------------------- SPEED TEST END ---------------------*/
+
+            Console.ReadLine();
         }
 
         private static void QueueManager_MessageReceived(object sender, MessageReceivedEventArgs<SampleModel> e)
