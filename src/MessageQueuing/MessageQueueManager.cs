@@ -78,6 +78,7 @@ namespace MessageQueuing
         {
             this.queueName = queueName;
             this.messageFormatter = messageFormatter;
+            this.InitiateMessageQueueManager();
         }
 
         public MessageQueueManager(string queueName)

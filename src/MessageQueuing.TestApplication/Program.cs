@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,19 +11,19 @@ namespace MessageQueuing.TestApplication
     {
         static void Main(string[] args)
         {
-            var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue", new JsonMessageFormatter());
 
-            for (int i = 0; i < 13; i++)
-            //while(true)
+            using (var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue", new JsonMessageFormatter()))
             {
                 queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
+
             }
 
-            //queueManager.MessageReceived += QueueManager_MessageReceived;
+            using (var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue", new XmlMessageFormatter()))
+            {
+                queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
 
-            //Console.ReadLine();
-            //queueManager.Dispose();
-            //Console.ReadLine();
+            }
+
         }
 
         private static void QueueManager_MessageReceived(object sender, MessageReceivedEventArgs<SampleModel> e)
