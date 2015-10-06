@@ -19,12 +19,9 @@ namespace MessageQueuing
         private bool readQueue = true;
         private bool disposing = false;
         private int? readTimeout = null;
-
         private CancellationTokenSource cancellationTokenSource;
         private CancellationToken cancellationToken;
-
-        private Task workerTask;
-
+        private IMessageFormatter messageFormatter = new JsonMessageFormatter(Encoding.UTF8);
         #endregion
 
         #region Events
@@ -60,6 +57,22 @@ namespace MessageQueuing
                 readTimeout = value;
             }
         }
+
+        /// <summary>
+        /// Message formatter for serializing the queue messages
+        /// </summary>
+        public IMessageFormatter MessageFormatter
+        {
+            get
+            {
+                return this.messageFormatter;
+            }
+            set
+            {
+                this.messageFormatter = value;
+            }
+        }
+
         #endregion
 
         #region Constructors
@@ -67,12 +80,12 @@ namespace MessageQueuing
         {
             this.queueName = queueName;
             messageQueue = new MessageQueue(queueName);
-            messageQueue.Formatter = new XmlMessageFormatter(new Type[] { typeof(T) });
+            messageQueue.Formatter = messageFormatter;
 
             this.cancellationTokenSource = new CancellationTokenSource();
             this.cancellationToken = cancellationTokenSource.Token;
 
-            this.workerTask = Task.Run(() =>
+            Task.Run(() =>
              {
                  cancellationToken.ThrowIfCancellationRequested();
 
