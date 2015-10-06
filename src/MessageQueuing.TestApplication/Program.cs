@@ -10,7 +10,7 @@ namespace MessageQueuing.TestApplication
     {
         static void Main(string[] args)
         {
-            var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue");
+            var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue", new JsonMessageFormatter());
 
             for (int i = 0; i < 13; i++)
             //while(true)

@@ -46,7 +46,8 @@ namespace MessageQueuing
         /// <summary>
         /// Message Queue read timeout in miliseconds
         /// </summary>
-        public int? ReadTimeout {
+        public int? ReadTimeout
+        {
             get
             {
                 return readTimeout;
@@ -67,51 +68,59 @@ namespace MessageQueuing
             {
                 return this.messageFormatter;
             }
-            set
-            {
-                this.messageFormatter = value;
-            }
         }
 
         #endregion
 
         #region Constructors
+
+        public MessageQueueManager(string queueName, IMessageFormatter messageFormatter)
+        {
+            this.queueName = queueName;
+            this.messageFormatter = messageFormatter;
+        }
+
         public MessageQueueManager(string queueName)
         {
             this.queueName = queueName;
-            messageQueue = new MessageQueue(queueName);
-            messageQueue.Formatter = messageFormatter;
+            this.InitiateMessageQueueManager();
+        }
+        #endregion
+
+        #region Methods
+
+        private void InitiateMessageQueueManager()
+        {
+            this.messageQueue = new MessageQueue(queueName);
+            this.messageQueue.Formatter = this.messageFormatter;
 
             this.cancellationTokenSource = new CancellationTokenSource();
             this.cancellationToken = cancellationTokenSource.Token;
 
             Task.Run(() =>
-             {
-                 cancellationToken.ThrowIfCancellationRequested();
+            {
+                cancellationToken.ThrowIfCancellationRequested();
 
-                 while (readQueue)
-                 {
-                     if (cancellationToken.IsCancellationRequested)
-                     {
-                         break;
-                     }
-                     else
-                     {
-                         if (MessageReceived != null)
-                         {
-                             var message = this.GetMessage();
-                             if (message != null)
-                             {
-                                 OnMessageReceived(new MessageReceivedEventArgs<T>(message));
-                             }
-                         }
-                     }
-                 }
-             }, cancellationToken);
+                while (readQueue)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        if (MessageReceived != null)
+                        {
+                            var message = this.GetMessage();
+                            if (message != null)
+                            {
+                                OnMessageReceived(new MessageReceivedEventArgs<T>(message));
+                            }
+                        }
+                    }
+                }
+            }, cancellationToken);
         }
-        #endregion
-
-        #region Methods
 
         /// <summary>
         /// Adds message to message queue
