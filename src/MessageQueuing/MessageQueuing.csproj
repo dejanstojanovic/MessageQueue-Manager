@@ -49,9 +49,6 @@
     <Compile Include="MessageQueueManager.cs" />
     <Compile Include="MessageReceivedEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Routing\BaseMessageRouter.cs" />
-    <Compile Include="Routing\IMessageRoute.cs" />
-    <Compile Include="Routing\IMessageRouter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
