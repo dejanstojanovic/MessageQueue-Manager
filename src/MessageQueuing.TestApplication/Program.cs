@@ -15,7 +15,8 @@ namespace MessageQueuing.TestApplication
             /*--------------------- SIZE TEST START ---------------------*/
 
             /* Using JSON formatter */
-            using (var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue", new JsonMessageFormatter()))
+            
+            using (var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue"))
             {
                 queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
             }
@@ -30,7 +31,7 @@ namespace MessageQueuing.TestApplication
 
             /*--------------------- SPEED TEST START ---------------------*/
             var JsonTimer = Stopwatch.StartNew();
-            new JsonMessageFormatter().Write(new Message(), new SampleModel());
+            new JsonMessageFormatter<SampleModel>().Write(new Message(), new SampleModel());
             JsonTimer.Stop();
 
             var XmlTimer = Stopwatch.StartNew();
@@ -42,6 +43,17 @@ namespace MessageQueuing.TestApplication
             /*--------------------- SPEED TEST END ---------------------*/
 
             Console.ReadLine();
+            using (var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue"))
+            {
+                queueManager.MessageQueue.Purge();
+                queueManager.RaiseEvents = true;
+                queueManager.MessageReceived += QueueManager_MessageReceived;
+
+                while (true)
+                {
+                    queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
+                }
+            }
         }
 
         private static void QueueManager_MessageReceived(object sender, MessageReceivedEventArgs<SampleModel> e)

@@ -21,7 +21,7 @@ namespace MessageQueuing
         private int? readTimeout = null;
         private CancellationTokenSource cancellationTokenSource;
         private CancellationToken cancellationToken;
-        private IMessageFormatter messageFormatter = new JsonMessageFormatter(Encoding.UTF8);
+        private IMessageFormatter messageFormatter = new JsonMessageFormatter<T>(Encoding.UTF8);
         #endregion
 
         #region Events
@@ -40,6 +40,14 @@ namespace MessageQueuing
             get
             {
                 return this.queueName;
+            }
+        }
+
+        public MessageQueue MessageQueue
+        {
+            get
+            {
+                return this.messageQueue;
             }
         }
 
@@ -68,6 +76,11 @@ namespace MessageQueuing
             {
                 return this.messageFormatter;
             }
+        }
+
+        public bool RaiseEvents
+        {
+            get; set;
         }
 
         #endregion
@@ -110,7 +123,7 @@ namespace MessageQueuing
                     }
                     else
                     {
-                        if (MessageReceived != null)
+                        if (MessageReceived != null && this.RaiseEvents)
                         {
                             var message = this.GetMessage();
                             if (message != null)
@@ -156,11 +169,11 @@ namespace MessageQueuing
                 {
                     if (this.readTimeout.HasValue)
                     {
-                        return messageQueue.Receive(TimeSpan.FromMilliseconds(this.readTimeout.Value)).Body as T;
+                        return this.messageFormatter.Read(messageQueue.Receive(TimeSpan.FromMilliseconds(this.readTimeout.Value))) as T;
                     }
                     else
                     {
-                        return messageQueue.Receive().Body as T;
+                        return this.messageFormatter.Read(messageQueue.Receive()) as T;
                     }
                 }
                 catch (MessageQueueException ex)

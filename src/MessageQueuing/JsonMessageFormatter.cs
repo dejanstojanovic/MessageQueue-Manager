@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MessageQueuing
 {
-    public class JsonMessageFormatter : IMessageFormatter
+    public class JsonMessageFormatter<T> : IMessageFormatter
     {
         private Encoding encoding;
 
@@ -39,7 +39,7 @@ namespace MessageQueuing
 
         public object Clone()
         {
-            return new JsonMessageFormatter(encoding);
+            return new JsonMessageFormatter<T>(encoding);
         }
 
         public object Read(Message message)
@@ -52,7 +52,7 @@ namespace MessageQueuing
             using (var reader = new StreamReader(message.BodyStream, encoding))
             {
                 var json = reader.ReadToEnd();
-                return JsonConvert.DeserializeObject(json);
+                return JsonConvert.DeserializeObject<T>(json);
             }
         }
 
