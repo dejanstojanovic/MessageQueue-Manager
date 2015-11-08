@@ -25,7 +25,7 @@ Actual handle method which will be triggered once the message of the type T is r
 - Direct cast of the message to object instance of specific type using generic type on the constructor
 - Optimized overridable multi-threaded rwading of the message from the queue
 
-Available as NuGet package
+Available as [NuGet package](https://www.nuget.org/packages/MessageQueueManager/)
 ```
 PM> Install-Package MessageQueueManager
 ```
