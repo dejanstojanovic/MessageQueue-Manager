@@ -24,3 +24,8 @@ Actual handle method which will be triggered once the message of the type T is r
 - Faster reading of the message from the queue thanks to [NetJSON](https://github.com/rpgmaker/NetJSON)
 - Direct cast of the message to object instance of specific type using generic type on the constructor
 - Optimized overridable multi-threaded rwading of the message from the queue
+
+Available as NuGet package
+```
+PM> Install-Package MessageQueueManager
+```
