@@ -20,7 +20,7 @@ Actual handle method which will be triggered once the message of the type T is r
 ## Benefits
 
 - Lower size of the message stored in a message queue thanks to custom Json Message Formatter
-- Fatser writing of the message to message queue thanks to [NetJSON](https://github.com/rpgmaker/NetJSON)
-- Fatser reading of the message from the queue thanks to [NetJSON](https://github.com/rpgmaker/NetJSON)
+- Faster writing of the message to message queue thanks to [NetJSON](https://github.com/rpgmaker/NetJSON)
+- Faster reading of the message from the queue thanks to [NetJSON](https://github.com/rpgmaker/NetJSON)
 - Direct cast of the message to object instance of specific type using generic type on the constructor
 - Optimized overridable multi-threaded rwading of the message from the queue
