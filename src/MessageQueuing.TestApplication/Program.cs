@@ -56,6 +56,7 @@ namespace MessageQueuing.TestApplication
                 //{
                 //    queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
                 //}
+                Console.ReadLine();
             }
             Console.ReadLine();
         }

@@ -23,10 +23,11 @@ namespace MessageQueuing
         private CancellationTokenSource cancellationTokenSource;
         private CancellationToken cancellationToken;
         private IMessageFormatter messageFormatter = new JsonMessageFormatter<T>(Encoding.UTF8);
+        private readonly int maximumTaskNumber = Environment.ProcessorCount;
         #endregion
 
         #region Constants
-        private const int MAXIMUMTHREADS = 10;
+
         #endregion
 
         #region Events
@@ -66,7 +67,6 @@ namespace MessageQueuing
 
         /// <summary>
         /// Maximum number of threads to run for rading the queue
-        /// TODO: Implement multiple threads to read the queue
         /// </summary>
         private int MaxumumParallelReadings
         {
@@ -75,9 +75,9 @@ namespace MessageQueuing
                 int maxThreadNum;
                 if (int.TryParse(ConfigurationManager.AppSettings.Get("MessageQueuing.MaximumThreads"), out maxThreadNum))
                 {
-                    return maxThreadNum;
+                    return maxThreadNum != 0 ? maxThreadNum : this.maximumTaskNumber;
                 }
-                return MAXIMUMTHREADS;
+                return this.maximumTaskNumber;
             }
         }
 
@@ -136,37 +136,34 @@ namespace MessageQueuing
             this.cancellationTokenSource = new CancellationTokenSource();
             this.cancellationToken = cancellationTokenSource.Token;
 
-
-            Task.Run(() =>
+            for (int t = 0; t < this.MaxumumParallelReadings; t++)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                while (readQueue)
+                Task.Run(() =>
                 {
-                    if (cancellationToken.IsCancellationRequested)
+                    //cancellationToken.ThrowIfCancellationRequested();
+
+                    while (readQueue)
                     {
-                        break;
-                    }
-                    else
-                    {
-                        if (MessageReceived != null && this.RaiseEvents)
+                        if (cancellationToken.IsCancellationRequested)
                         {
-                            var message = this.GetMessage();
-                            if (message != null)
+                            break;
+                        }
+                        else
+                        {
+                            if (MessageReceived != null && this.RaiseEvents)
                             {
-                                OnMessageReceived(new MessageReceivedEventArgs<T>(message));
+                                var message = this.GetMessage();
+                                if (message != null)
+                                {
+                                    OnMessageReceived(new MessageReceivedEventArgs<T>(message));
+                                }
                             }
                         }
                     }
-                }
-            }, cancellationToken);
+                }, cancellationToken);
+            }
         }
-    
 
-        private IEnumerable<bool> ReadQueue()
-        {
-            yield return readQueue;
-        }
 
         /// <summary>
         /// Adds message to message queue
@@ -225,7 +222,7 @@ namespace MessageQueuing
             if (!disposing)
             {
                 disposing = true;
-                //cancellationTokenSource.Cancel();
+                cancellationTokenSource.Cancel();
                 messageQueue.Dispose();
             }
         }
