@@ -5,6 +5,7 @@ using System.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Configuration;
 
 namespace MessageQueuing
 {
@@ -22,6 +23,10 @@ namespace MessageQueuing
         private CancellationTokenSource cancellationTokenSource;
         private CancellationToken cancellationToken;
         private IMessageFormatter messageFormatter = new JsonMessageFormatter<T>(Encoding.UTF8);
+        #endregion
+
+        #region Constants
+        private const int MAXIMUMTHREADS = 10;
         #endregion
 
         #region Events
@@ -43,11 +48,36 @@ namespace MessageQueuing
             }
         }
 
+        /// <summary>
+        /// Start rwading with event raising
+        /// </summary>
+        public bool RaiseEvents { get; set; }
+
+        /// <summary>
+        /// The MessageQueue instance which is wrapped in MessegeQueueManager instance
+        /// </summary>
         public MessageQueue MessageQueue
         {
             get
             {
                 return this.messageQueue;
+            }
+        }
+
+        /// <summary>
+        /// Maximum number of threads to run for rading the queue
+        /// TODO: Implement multiple threads to read the queue
+        /// </summary>
+        private int MaxumumParallelReadings
+        {
+            get
+            {
+                int maxThreadNum;
+                if (int.TryParse(ConfigurationManager.AppSettings.Get("MessageQueuing.MaximumThreads"), out maxThreadNum))
+                {
+                    return maxThreadNum;
+                }
+                return MAXIMUMTHREADS;
             }
         }
 
@@ -78,11 +108,6 @@ namespace MessageQueuing
             }
         }
 
-        public bool RaiseEvents
-        {
-            get; set;
-        }
-
         #endregion
 
         #region Constructors
@@ -111,6 +136,7 @@ namespace MessageQueuing
             this.cancellationTokenSource = new CancellationTokenSource();
             this.cancellationToken = cancellationTokenSource.Token;
 
+
             Task.Run(() =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -134,6 +160,12 @@ namespace MessageQueuing
                     }
                 }
             }, cancellationToken);
+        }
+    
+
+        private IEnumerable<bool> ReadQueue()
+        {
+            yield return readQueue;
         }
 
         /// <summary>
@@ -165,20 +197,13 @@ namespace MessageQueuing
         {
             if (messageQueue != null)
             {
-                try
+                if (this.readTimeout.HasValue)
                 {
-                    if (this.readTimeout.HasValue)
-                    {
-                        return this.messageFormatter.Read(messageQueue.Receive(TimeSpan.FromMilliseconds(this.readTimeout.Value))) as T;
-                    }
-                    else
-                    {
-                        return this.messageFormatter.Read(messageQueue.Receive()) as T;
-                    }
+                    return this.messageFormatter.Read(messageQueue.Receive(TimeSpan.FromMilliseconds(this.readTimeout.Value))) as T;
                 }
-                catch (MessageQueueException ex)
+                else
                 {
-                    return null;
+                    return this.messageFormatter.Read(messageQueue.Receive()) as T;
                 }
             }
             return null;
@@ -200,7 +225,7 @@ namespace MessageQueuing
             if (!disposing)
             {
                 disposing = true;
-                cancellationTokenSource.Cancel();
+                //cancellationTokenSource.Cancel();
                 messageQueue.Dispose();
             }
         }

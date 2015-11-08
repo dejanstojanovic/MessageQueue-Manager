@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿//using Newtonsoft.Json;
+using NetJSON;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Messaging;
@@ -52,7 +54,7 @@ namespace MessageQueuing
             using (var reader = new StreamReader(message.BodyStream, encoding))
             {
                 var json = reader.ReadToEnd();
-                return JsonConvert.DeserializeObject<T>(json);
+                return NetJSON.NetJSON.Deserialize<T>(json);
             }
         }
 
@@ -62,8 +64,7 @@ namespace MessageQueuing
             {
                 throw new ArgumentNullException("message");
             }
-
-            string json = JsonConvert.SerializeObject(obj, Formatting.None);
+            string json = NetJSON.NetJSON.Serialize(obj);
             message.BodyStream = new MemoryStream(encoding.GetBytes(json));
         }
     }
