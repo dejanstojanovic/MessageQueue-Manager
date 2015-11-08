@@ -16,3 +16,11 @@ Actual handle method which will be triggered once the message of the type T is r
             Console.WriteLine("Message received {0} {1}", e.Message.ID, e.Message.TimeCreated.ToString("yyyy-MM-dd HH:mm:ss.fff"));
         }
 ```
+
+## Benefits
+
+- Lower size of the message stored in a message queue thanks to custom Json Message Formatter
+- Fatser writing of the message to message queue thanks to Net.Json
+- Fatser reading of the message from the queue thanks to Net.Json
+- Direct cast of the message to object instance of specific type using generic type on the constructor
+- Optimized overridable multi-threaded rwading of the message from the queue
