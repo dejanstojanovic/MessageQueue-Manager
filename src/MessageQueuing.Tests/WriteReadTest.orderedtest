@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<OrderedTest name="WriteReadTest" storage="d:\github\messagequeue-manager.git\trunk\src\messagequeuing.tests\writereadtest.orderedtest" id="5a0a7d86-ee34-434a-8a79-f7eb33de5a5f" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
-  <TestLinks>
-    <TestLink id="ebe5f645-d6d7-43d7-07f5-d4db2a487820" name="TestWriteXml" storage="bin\debug\messagequeuing.tests.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <TestLink id="5d80f472-98f2-e533-a631-497cac4e0593" name="ReadXml" storage="bin\debug\messagequeuing.tests.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <TestLink id="a71200c3-d2fc-e60c-239f-9d49d189523b" name="TestWriteJson" storage="bin\debug\messagequeuing.tests.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <TestLink id="da61abd2-2342-4313-90d3-a896a373c931" name="ReadJson" storage="bin\debug\messagequeuing.tests.dll" type="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestElement, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  </TestLinks>
-</OrderedTest>

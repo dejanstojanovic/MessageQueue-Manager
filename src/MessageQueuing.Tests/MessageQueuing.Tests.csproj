@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Messaging" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -52,15 +53,18 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="JsonMessageFormatterTests.cs" />
     <Compile Include="Models\TestModel.cs" />
-    <Compile Include="QueueManager\ReadTests.cs" />
-    <Compile Include="QueueManager\WriteTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="WriteReadTest.orderedtest">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\MessageQueuing\MessageQueuing.csproj">
+      <Project>{6010d01d-9780-4534-9fb2-be0d9f5aa74c}</Project>
+      <Name>MessageQueuing</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
