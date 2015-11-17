@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/github/dejanstojanovic/MessageQueue-Manager?branch=master&svg=true)](https://ci.appveyor.com/project/dejanstojanovic/MessageQueue-Manager/branch/master)
+
 # MessageQueue-Manager
 Event driven class for reading messages from MSMQ
 
