@@ -21,7 +21,11 @@ namespace MessageQueuing.Tests
             JsonMessageFormatter<TestModel> readFormatter = new JsonMessageFormatter<TestModel>(Encoding.UTF8);
             TestModel readObject = readFormatter.Read(message) as TestModel;
 
-            Assert.IsTrue(readObject!=null && writeObject.ID == readObject.ID && writeObject.TimeCreated == readObject.TimeCreated);
+            string dateFormat = "yyyy-MM-dd HH:mm:ss";
+
+            Assert.IsTrue(readObject!=null && 
+                writeObject.ID == readObject.ID && 
+                writeObject.TimeCreated.ToString(dateFormat) == readObject.TimeCreated.ToString(dateFormat));
         }
     }
 }
