@@ -17,13 +17,9 @@ namespace MessageQueuing
         #region Fields
         private string queueName;
         private MessageQueue messageQueue;
-        private bool readQueue = true;
-        private bool disposing = false;
-        private int? readTimeout = null;
-        private CancellationTokenSource cancellationTokenSource;
-        private CancellationToken cancellationToken;
+        private bool disposing = false;       
         private IMessageFormatter messageFormatter = new JsonMessageFormatter<T>(Encoding.UTF8);
-        private readonly int maximumTaskNumber = Environment.ProcessorCount;
+        
         #endregion
 
         #region Constants
@@ -49,11 +45,7 @@ namespace MessageQueuing
             }
         }
 
-        /// <summary>
-        /// Start rwading with event raising
-        /// </summary>
-        public bool RaiseEvents { get; set; }
-
+        
         /// <summary>
         /// The MessageQueue instance which is wrapped in MessegeQueueManager instance
         /// </summary>
@@ -65,37 +57,6 @@ namespace MessageQueuing
             }
         }
 
-        /// <summary>
-        /// Maximum number of threads to run for rading the queue
-        /// </summary>
-        private int MaxumumParallelReadings
-        {
-            get
-            {
-                int maxThreadNum;
-                if (int.TryParse(ConfigurationManager.AppSettings.Get("MessageQueuing.MaximumThreads"), out maxThreadNum))
-                {
-                    return maxThreadNum != 0 ? maxThreadNum : this.maximumTaskNumber;
-                }
-                return this.maximumTaskNumber;
-            }
-        }
-
-        /// <summary>
-        /// Message Queue read timeout in miliseconds
-        /// </summary>
-        public int? ReadTimeout
-        {
-            get
-            {
-                return readTimeout;
-
-            }
-            set
-            {
-                readTimeout = value;
-            }
-        }
 
         /// <summary>
         /// Message formatter for serializing the queue messages
@@ -133,36 +94,23 @@ namespace MessageQueuing
             this.messageQueue = new MessageQueue(queueName);
             this.messageQueue.Formatter = this.messageFormatter;
 
-            this.cancellationTokenSource = new CancellationTokenSource();
-            this.cancellationToken = cancellationTokenSource.Token;
+            this.messageQueue.BeginReceive();
 
-            for (int t = 0; t < this.MaxumumParallelReadings; t++)
-            {
-                Task.Run(() =>
-                {
-                    //cancellationToken.ThrowIfCancellationRequested();
-
-                    while (readQueue)
-                    {
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            if (MessageReceived != null && this.RaiseEvents)
-                            {
-                                var message = this.GetMessage();
-                                if (message != null)
-                                {
-                                    OnMessageReceived(new MessageReceivedEventArgs<T>(message));
-                                }
-                            }
-                        }
-                    }
-                }, cancellationToken);
-            }
+            this.messageQueue.ReceiveCompleted += MessageQueue_ReceiveCompleted; 
         }
+
+        private void MessageQueue_ReceiveCompleted(object sender, ReceiveCompletedEventArgs e)
+        {
+            if (e.Message != null && e.Message.Body!=null)
+            {
+                var message = e.Message.Body as T;
+                if (message != null)
+                {
+                    OnMessageReceived(new MessageReceivedEventArgs<T>(message));
+                }
+            }
+        
+    }
 
 
         /// <summary>
@@ -186,25 +134,7 @@ namespace MessageQueuing
             messageQueue.Send(message);
         }
 
-        /// <summary>
-        /// Read the message from the queue
-        /// </summary>
-        /// <returns>Instance of object T fetched from the queue</returns>
-        public T GetMessage()
-        {
-            if (messageQueue != null)
-            {
-                if (this.readTimeout.HasValue)
-                {
-                    return this.messageFormatter.Read(messageQueue.Receive(TimeSpan.FromMilliseconds(this.readTimeout.Value))) as T;
-                }
-                else
-                {
-                    return this.messageFormatter.Read(messageQueue.Receive()) as T;
-                }
-            }
-            return null;
-        }
+
 
         protected virtual void OnMessageReceived(MessageReceivedEventArgs<T> e)
         {
@@ -222,7 +152,6 @@ namespace MessageQueuing
             if (!disposing)
             {
                 disposing = true;
-                cancellationTokenSource.Cancel();
                 messageQueue.Dispose();
             }
         }
