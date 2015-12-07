@@ -7,6 +7,7 @@ Create instance of the MessageQueueManager class for the type T and attach handl
 
 ```csharp
  MessageQueueManager queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue");
+ queueManager.RaiseEvents = true;
  queueManager.MessageReceived += QueueManager_MessageReceived;
 ```
 
