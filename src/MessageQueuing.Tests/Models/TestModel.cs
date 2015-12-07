@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MessageQueuing.Tests.Models
 {
-    public class TestModel
+    class TestModel
     {
         public string ID
         {

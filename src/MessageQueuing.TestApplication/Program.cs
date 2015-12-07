@@ -18,9 +18,11 @@ namespace MessageQueuing.TestApplication
 
             using (var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue"))
             {
-                queueManager.RaiseEvents = true;
                 queueManager.MessageReceived += QueueManager_MessageReceived1;
-                queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
+                for (int i = 0; i < 30; i++)
+                {
+                    queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
+                }
             }
 
             /* Using XML formatter */

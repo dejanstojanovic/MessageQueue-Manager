@@ -19,8 +19,7 @@ namespace MessageQueuing
         private MessageQueue messageQueue;
         private bool disposing = false;
         private IMessageFormatter messageFormatter = new JsonMessageFormatter<T>(Encoding.UTF8);
-        private bool raiseEvents = false;
-        IAsyncResult asyncResult = null;
+        //IAsyncResult asyncResult = null;
         #endregion
 
         #region Constants
@@ -43,31 +42,6 @@ namespace MessageQueuing
             get
             {
                 return this.queueName;
-            }
-        }
-
-
-        public bool RaiseEvents
-        {
-            get
-            {
-                return this.raiseEvents;
-            }
-            set
-            {
-                if (value)
-                {
-                    asyncResult = this.messageQueue.BeginReceive();
-                }
-                else
-                {
-                    if (this.asyncResult != null)
-                    {
-                        this.messageQueue.EndReceive(this.asyncResult);
-                        this.asyncResult = null;
-                    }
-                }
-                this.raiseEvents = value;
             }
         }
 
@@ -119,10 +93,12 @@ namespace MessageQueuing
             this.messageQueue = new MessageQueue(queueName);
             this.messageQueue.Formatter = this.messageFormatter;
             this.messageQueue.ReceiveCompleted += MessageQueue_ReceiveCompleted;
+            this.messageQueue.BeginReceive();
         }
 
         private void MessageQueue_ReceiveCompleted(object sender, ReceiveCompletedEventArgs e)
         {
+            this.messageQueue.BeginReceive();
             if (e.Message != null && e.Message.Body != null)
             {
                 var message = e.Message.Body as T;
