@@ -18,6 +18,7 @@ namespace MessageQueuing.TestApplication
 
             using (var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue"))
             {
+                queueManager.RaiseEvents = true;
                 queueManager.MessageReceived += QueueManager_MessageReceived1;
                 queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
             }
@@ -68,6 +69,6 @@ namespace MessageQueuing.TestApplication
             Console.WriteLine("Message received {0} {1}", e.Message.ID, e.Message.TimeCreated.ToString("yyyy-MM-dd HH:mm:ss.fff"));
         }
 
-        
+
     }
 }

@@ -17,9 +17,10 @@ namespace MessageQueuing
         #region Fields
         private string queueName;
         private MessageQueue messageQueue;
-        private bool disposing = false;       
+        private bool disposing = false;
         private IMessageFormatter messageFormatter = new JsonMessageFormatter<T>(Encoding.UTF8);
-        
+        private bool raiseEvents = false;
+        IAsyncResult asyncResult = null;
         #endregion
 
         #region Constants
@@ -45,7 +46,31 @@ namespace MessageQueuing
             }
         }
 
-        
+
+        public bool RaiseEvents
+        {
+            get
+            {
+                return this.raiseEvents;
+            }
+            set
+            {
+                if (value)
+                {
+                    asyncResult = this.messageQueue.BeginReceive();
+                }
+                else
+                {
+                    if (this.asyncResult != null)
+                    {
+                        this.messageQueue.EndReceive(this.asyncResult);
+                        this.asyncResult = null;
+                    }
+                }
+                this.raiseEvents = value;
+            }
+        }
+
         /// <summary>
         /// The MessageQueue instance which is wrapped in MessegeQueueManager instance
         /// </summary>
@@ -93,15 +118,12 @@ namespace MessageQueuing
         {
             this.messageQueue = new MessageQueue(queueName);
             this.messageQueue.Formatter = this.messageFormatter;
-
-            this.messageQueue.BeginReceive();
-
-            this.messageQueue.ReceiveCompleted += MessageQueue_ReceiveCompleted; 
+            this.messageQueue.ReceiveCompleted += MessageQueue_ReceiveCompleted;
         }
 
         private void MessageQueue_ReceiveCompleted(object sender, ReceiveCompletedEventArgs e)
         {
-            if (e.Message != null && e.Message.Body!=null)
+            if (e.Message != null && e.Message.Body != null)
             {
                 var message = e.Message.Body as T;
                 if (message != null)
@@ -109,8 +131,7 @@ namespace MessageQueuing
                     OnMessageReceived(new MessageReceivedEventArgs<T>(message));
                 }
             }
-        
-    }
+        }
 
 
         /// <summary>
@@ -134,7 +155,10 @@ namespace MessageQueuing
             messageQueue.Send(message);
         }
 
-
+        public T GetMessage()
+        {
+            return this.messageQueue.Receive() as T;
+        }
 
         protected virtual void OnMessageReceived(MessageReceivedEventArgs<T> e)
         {
