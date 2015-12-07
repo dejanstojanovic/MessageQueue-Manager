@@ -47,7 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="JsonMessageFormatter.cs" />
-    <Compile Include="MessageQueueManager.cs" />
+    <Compile Include="MessageQueueExtended.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="MessageReceivedEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

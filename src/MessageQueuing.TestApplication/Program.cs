@@ -16,13 +16,24 @@ namespace MessageQueuing.TestApplication
 
             /* Using JSON formatter */
 
-            using (var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue"))
+            using (var queueManager = new MessageQueueExtended<SampleModel>(@".\private$\TestQueue"))
             {
                 queueManager.MessageReceived += QueueManager_MessageReceived1;
-                for (int i = 0; i < 30; i++)
+                for (int i = 0; i < 5; i++)
                 {
-                    queueManager.AddMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
+                    queueManager.SendMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
                 }
+
+                Console.ReadLine();
+
+                queueManager.SendMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
+                Console.ReadLine();
+
+                queueManager.SendMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
+                Console.ReadLine();
+
+                queueManager.SendMessage(new SampleModel() { ID = Guid.NewGuid().ToString(), TimeCreated = DateTime.Now });
+                Console.ReadLine();
             }
 
             /* Using XML formatter */
@@ -48,7 +59,7 @@ namespace MessageQueuing.TestApplication
 
 
 
-            Console.ReadLine();
+            
 
             //using (var queueManager = new MessageQueueManager<SampleModel>(@".\private$\TestQueue", new XmlMessageFormatter()))
             //{
